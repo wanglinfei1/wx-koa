@@ -2,7 +2,7 @@
  * @Author: linfei6
  * @Date: 2022-07-19 14:37:17
  * @LastEditors: linfei6
- * @LastEditTime: 2022-07-19 16:19:53
+ * @LastEditTime: 2022-07-19 16:23:23
  */
 const Koa = require("koa");
 const Router = require("koa-router");
@@ -15,18 +15,11 @@ const { init: initDB, Counter } = require("./db");
 
 const router = new Router();
 
-const homePage = fs.readFileSync(path.join(__dirname, "index.html"), "utf-8");
 // 首页
+const homePage = fs.readFileSync(path.join(__dirname, "index.html"), "utf-8");
 router.get("/", async(ctx) => {
   ctx.body = homePage;
 });
-
-app.use(proxy('/page', {
-  target: 'https://7072-prod-9gu6ius49f74f9cf-1255449337.tcb.qcloud.la',
-  pathRewrite: {
-    '^/page': '/'
-  }
-}));
 
 // 更新计数
 router.post("/api/count", async(ctx) => {
@@ -39,7 +32,6 @@ router.post("/api/count", async(ctx) => {
       truncate: true,
     });
   }
-
   ctx.body = {
     code: 0,
     data: await Counter.count(),
@@ -49,7 +41,6 @@ router.post("/api/count", async(ctx) => {
 // 获取计数
 router.get("/api/count", async(ctx) => {
   const result = await Counter.count();
-
   ctx.body = {
     code: 0,
     data: result,
@@ -69,6 +60,13 @@ app
   .use(bodyParser())
   .use(router.routes())
   .use(router.allowedMethods());
+
+app.use(proxy('/page', {
+  target: 'https://7072-prod-9gu6ius49f74f9cf-1255449337.tcb.qcloud.la',
+  pathRewrite: {
+    '^/page': '/'
+  }
+}));
 
 const port = process.env.PORT || 80;
 async function bootstrap() {
