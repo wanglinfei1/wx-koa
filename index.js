@@ -2,7 +2,7 @@
  * @Author: linfei6
  * @Date: 2022-07-19 14:37:17
  * @LastEditors: linfei6
- * @LastEditTime: 2022-07-19 16:45:30
+ * @LastEditTime: 2022-07-19 17:16:14
  */
 const Koa = require("koa");
 const Router = require("koa-router");
@@ -63,9 +63,7 @@ app
 
 app.use(proxy('/page', {
   target: 'https://7072-prod-9gu6ius49f74f9cf-1255449337.tcb.qcloud.la',
-  pathRewrite: {
-    '^/page': '/page'
-  }
+  changeOrigin: true
 }));
 
 const port = process.env.PORT || 80;
