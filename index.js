@@ -1,22 +1,35 @@
+/*
+ * @Author: linfei6
+ * @Date: 2022-07-19 14:37:17
+ * @LastEditors: linfei6
+ * @LastEditTime: 2022-07-19 16:19:53
+ */
 const Koa = require("koa");
 const Router = require("koa-router");
 const logger = require("koa-logger");
 const bodyParser = require("koa-bodyparser");
 const fs = require("fs");
 const path = require("path");
+const proxy = require('koa-server-http-proxy')
 const { init: initDB, Counter } = require("./db");
 
 const router = new Router();
 
 const homePage = fs.readFileSync(path.join(__dirname, "index.html"), "utf-8");
-
 // 首页
-router.get("/", async (ctx) => {
+router.get("/", async(ctx) => {
   ctx.body = homePage;
 });
 
+app.use(proxy('/page', {
+  target: 'https://7072-prod-9gu6ius49f74f9cf-1255449337.tcb.qcloud.la',
+  pathRewrite: {
+    '^/page': '/'
+  }
+}));
+
 // 更新计数
-router.post("/api/count", async (ctx) => {
+router.post("/api/count", async(ctx) => {
   const { request } = ctx;
   const { action } = request.body;
   if (action === "inc") {
@@ -34,7 +47,7 @@ router.post("/api/count", async (ctx) => {
 });
 
 // 获取计数
-router.get("/api/count", async (ctx) => {
+router.get("/api/count", async(ctx) => {
   const result = await Counter.count();
 
   ctx.body = {
@@ -44,7 +57,7 @@ router.get("/api/count", async (ctx) => {
 });
 
 // 小程序调用，获取微信 Open ID
-router.get("/api/wx_openid", async (ctx) => {
+router.get("/api/wx_openid", async(ctx) => {
   if (ctx.request.headers["x-wx-source"]) {
     ctx.body = ctx.request.headers["x-wx-openid"];
   }
